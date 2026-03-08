@@ -25,7 +25,8 @@ const getDefaultDayData = () => ({
     },
     events: [],
     symptoms: [],
-    sosMedications: []
+    sosMedications: [],
+    aura: []
 })
 
 const App = () => {
@@ -216,16 +217,26 @@ const App = () => {
 
                 const medP = (medTakenCount / 3) * 10
 
+                // Aura (positive factors) bonus
+                const rawAura = dayInfo.aura || []
+                const totalAuraBonus = rawAura.reduce(
+                    (total, a) => total + (typeof a === 'string' ? 1 : (a?.impact || 1)),
+                    0
+                )
+
                 // Automated Wellness Calculation (70% portion)
-                // Base 100 - Pain*5 - BodyPain*4 - Fatigue*4 - Bathroom*3 - SymptomImpact*2
+                // Base 100 - Pain*5 - BodyPain*4 - Fatigue*4 - Bathroom*3 - SymptomImpact*2 + AuraBonus*2
                 const autoWellness = Math.max(
                     0,
-                    100
-                    - ((dayInfo.controls?.pain || 0) * 5)
-                    - ((dayInfo.controls?.bodyPain || 0) * 4)
-                    - ((dayInfo.controls?.fatigue || 0) * 4)
-                    - ((dayInfo.controls?.bathroom || 0) * 3)
-                    - (totalSymptomImpactUnits * 2)
+                    Math.min(100,
+                        100
+                        - ((dayInfo.controls?.pain || 0) * 5)
+                        - ((dayInfo.controls?.bodyPain || 0) * 4)
+                        - ((dayInfo.controls?.fatigue || 0) * 4)
+                        - ((dayInfo.controls?.bathroom || 0) * 3)
+                        - (totalSymptomImpactUnits * 2)
+                        + (totalAuraBonus * 2)
+                    )
                 )
                 const wellnessP = (autoWellness / 100) * 70
 
@@ -350,6 +361,18 @@ const App = () => {
         updateDayData({ sosMedications })
     }
 
+    // Handlers para aura (fatores positivos)
+    const handleAddAura = (item) => {
+        const aura = dayData.aura || []
+        updateDayData({ aura: [...aura, item] })
+    }
+
+    const handleRemoveAura = (index) => {
+        const aura = [...(dayData.aura || [])]
+        aura.splice(index, 1)
+        updateDayData({ aura })
+    }
+
     // Analisar sintomas (mock)
     const handleAnalyze = () => {
         const rawSymptoms = dayData.symptoms || []
@@ -363,6 +386,9 @@ const App = () => {
             .filter(Boolean)
         const pain = dayData.controls?.pain || 0
 
+        const auraItems = dayData.aura || []
+        const auraNames = auraItems.map(a => typeof a === 'string' ? a : (a?.name || '')).filter(Boolean)
+
         let message = '📊 Análise dos Sintomas:\n\n'
 
         if (normalizedSymptoms.length === 0 && pain === 0) {
@@ -375,6 +401,10 @@ const App = () => {
                 message += '⚠️ Múltiplos sintomas registrados. Monitore a evolução.\n'
             }
             message += `\nSintomas: ${symptomNames.join(', ') || 'Nenhum'}\nNível de dor: ${pain}/10`
+        }
+
+        if (auraNames.length > 0) {
+            message += `\n\n✨ Aura positiva: ${auraNames.join(', ')}`
         }
 
         alert(message)
@@ -420,6 +450,11 @@ const App = () => {
                     const imp = typeof s === 'string' ? 1 : (s?.impact || 1)
                     return t + imp
                 }, 0)
+                const rawAura = info.aura || []
+                const totalAuraBonus = rawAura.reduce((t, a) => {
+                    const imp = typeof a === 'string' ? 1 : (a?.impact || 1)
+                    return t + imp
+                }, 0)
                 const events = info.events || []
                 const eventPenalties = { inter: 10, ps: 8, imuno: 4 }
                 const medsTaken = [
@@ -428,7 +463,7 @@ const App = () => {
                     info.medications?.weekly?.taken
                 ].filter(Boolean).length
                 const medP = (medsTaken / 3) * 10
-                const wellness = Math.max(0, 100 - ((info.controls?.pain || 0) * 5) - ((info.controls?.bodyPain || 0) * 4) - ((info.controls?.fatigue || 0) * 4) - ((info.controls?.bathroom || 0) * 3) - (totalImpact * 2))
+                const wellness = Math.max(0, Math.min(100, 100 - ((info.controls?.pain || 0) * 5) - ((info.controls?.bodyPain || 0) * 4) - ((info.controls?.fatigue || 0) * 4) - ((info.controls?.bathroom || 0) * 3) - (totalImpact * 2) + (totalAuraBonus * 2)))
                 const wellP = (wellness / 100) * 70
                 const symptomP = Math.max(0, 10 - (totalImpact * 2))
                 const eventPen = events.reduce((t, e) => t + (eventPenalties[e] || 0), 0)
@@ -452,6 +487,7 @@ const App = () => {
             let totalFatigue = 0
             let fatigueDays = 0
             const allSosMeds = new Map()
+            const allAuraNames = new Map()
 
             daysWithActivity.forEach(d => {
                 (d.symptoms || []).forEach(s => {
@@ -464,6 +500,10 @@ const App = () => {
                 });
                 (d.sosMedications || []).forEach(m => {
                     allSosMeds.set(m, (allSosMeds.get(m) || 0) + 1)
+                });
+                (d.aura || []).forEach(a => {
+                    const name = typeof a === 'string' ? a : (a?.name || '')
+                    if (name) allAuraNames.set(name, (allAuraNames.get(name) || 0) + 1)
                 })
                 totalCorticoide += (d.controls?.corticoide || 0)
                 totalBathroom += (d.controls?.bathroom || 0)
@@ -545,7 +585,8 @@ const App = () => {
                 ['Média Cansaço', fatigueDays > 0 ? `${(totalFatigue / fatigueDays).toFixed(1)}/10` : 'Sem registro'],
                 ['Sintomas Distintos', `${allSymptomNames.size}`],
                 ['Eventos', Object.keys(allEventCounts).length > 0 ? Object.entries(allEventCounts).map(([k, v]) => `${k} (${v}x)`).join(', ') : 'Nenhum'],
-                ['Medicamentos SOS', allSosMeds.size > 0 ? [...allSosMeds.entries()].map(([k, v]) => `${k} (${v}x)`).join(', ') : 'Nenhum']
+                ['Medicamentos SOS', allSosMeds.size > 0 ? [...allSosMeds.entries()].map(([k, v]) => `${k} (${v}x)`).join(', ') : 'Nenhum'],
+                ['Aura Positiva', allAuraNames.size > 0 ? [...allAuraNames.entries()].map(([k, v]) => `${k} (${v}x)`).join(', ') : 'Nenhuma']
             ]
 
             y = 128
@@ -684,6 +725,25 @@ const App = () => {
                     y += 4
                 }
 
+                // Aura Positiva
+                const auraItems = dayInfo.aura || []
+                if (auraItems.length > 0) {
+                    drawSection('Aura Positiva')
+                    doc.setFontSize(10)
+                    auraItems.forEach(a => {
+                        checkPage()
+                        const name = typeof a === 'string' ? a : (a?.name || 'Item')
+                        const impact = typeof a === 'string' ? 1 : (a?.impact || 1)
+                        const impactLbl = impact === 1 ? 'leve' : impact === 3 ? 'intenso' : 'moderado'
+                        doc.setTextColor(34, 197, 94)
+                        doc.text(`✦ ${name}`, marginL + 4, y)
+                        doc.setTextColor(...grey)
+                        doc.text(`(${impactLbl})`, marginL + 4 + doc.getTextWidth(`✦ ${name} `), y)
+                        y += lineH
+                    })
+                    y += 4
+                }
+
                 // Footer
                 doc.setFontSize(8)
                 doc.setTextColor(...grey)
@@ -812,6 +872,7 @@ const App = () => {
                             medicationsTaken={medicationsTaken}
                             totalMedications={3}
                             symptoms={dayData.symptoms || []}
+                            aura={dayData.aura || []}
                             bathroomLevel={dayData.controls?.bathroom || 0}
                             painLevel={dayData.controls?.pain || 0}
                             bodyPainLevel={dayData.controls?.bodyPain || 0}
@@ -848,11 +909,14 @@ const App = () => {
                             events={dayData.events || []}
                             symptoms={dayData.symptoms || []}
                             sosMedications={dayData.sosMedications || []}
+                            aura={dayData.aura || []}
                             onToggleEvent={handleToggleEvent}
                             onAddSymptom={handleAddSymptom}
                             onAddSosMed={handleAddSosMed}
                             onRemoveSymptom={handleRemoveSymptom}
                             onRemoveSosMed={handleRemoveSosMed}
+                            onAddAura={handleAddAura}
+                            onRemoveAura={handleRemoveAura}
                             onAnalyze={handleAnalyze}
                             onExportPDF={handleExportPDF}
                             onBackup={handleBackup}

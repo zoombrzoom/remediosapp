@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react'
 
-const HealthGauge = ({ medicationsTaken, totalMedications, symptoms, bathroomLevel = 0, painLevel = 0, bodyPainLevel = 0, fatigueLevel = 0, events = [], onExpand }) => {
+const HealthGauge = ({ medicationsTaken, totalMedications, symptoms, aura = [], bathroomLevel = 0, painLevel = 0, bodyPainLevel = 0, fatigueLevel = 0, events = [], onExpand }) => {
     const canvasRef = useRef(null)
 
     const normalizedSymptoms = (symptoms || []).map(s =>
@@ -14,6 +14,11 @@ const HealthGauge = ({ medicationsTaken, totalMedications, symptoms, bathroomLev
         0
     )
 
+    const totalAuraBonus = (aura || []).reduce(
+        (total, a) => total + (typeof a === 'string' ? 1 : (a?.impact || 1)),
+        0
+    )
+
     // Event Penalties (Stability component)
     const eventPenalties = {
         inter: 10,
@@ -21,10 +26,8 @@ const HealthGauge = ({ medicationsTaken, totalMedications, symptoms, bathroomLev
         imuno: 4
     }
 
-    // Calcular porcentagens conforme pedido:
-
-    // 70% Bem-estar: 100 - Pain*5 - BodyPain*4 - Fatigue*4 - Bathroom*3 - SymptomImpact*2
-    const calculatedWellness = Math.max(0, 100 - (painLevel * 5) - (bodyPainLevel * 4) - (fatigueLevel * 4) - (bathroomLevel * 3) - (totalSymptomImpactUnits * 2))
+    // 70% Bem-estar: 100 - Pain*5 - BodyPain*4 - Fatigue*4 - Bathroom*3 - SymptomImpact*2 + AuraBonus*2
+    const calculatedWellness = Math.max(0, Math.min(100, 100 - (painLevel * 5) - (bodyPainLevel * 4) - (fatigueLevel * 4) - (bathroomLevel * 3) - (totalSymptomImpactUnits * 2) + (totalAuraBonus * 2)))
     const wellP = (calculatedWellness / 100) * 70
 
     // 10% Sintomas (cada unidade de impacto tira 2% da nota total,

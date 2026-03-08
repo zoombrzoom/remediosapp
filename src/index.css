@@ -271,6 +271,18 @@ body::before {
   border-radius: var(--radius-md);
 }
 
+.btn-aura {
+  background: linear-gradient(135deg, #22C55E 0%, #16A34A 100%);
+  color: #FFFFFF;
+  box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
+}
+
+.btn-aura:hover {
+  background: linear-gradient(135deg, #4ADE80 0%, #22C55E 100%);
+  box-shadow: 0 6px 24px rgba(34, 197, 94, 0.5);
+  transform: translateY(-1px);
+}
+
 .btn-sm {
   padding: var(--spacing-xs) var(--spacing-sm);
   font-size: 0.75rem;
@@ -412,6 +424,12 @@ input[type="range"]::-moz-range-thumb {
 .badge-primary {
   background: var(--color-primary-glow);
   color: var(--color-primary);
+}
+
+.badge-aura {
+  background: rgba(34, 197, 94, 0.15);
+  color: #22C55E;
+  border: 1px solid rgba(34, 197, 94, 0.3);
 }
 
 /* ============================================

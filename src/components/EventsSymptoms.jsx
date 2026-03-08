@@ -4,11 +4,14 @@ const EventsSymptoms = ({
     events,
     symptoms,
     sosMedications,
+    aura = [],
     onToggleEvent,
     onAddSymptom,
     onAddSosMed,
     onRemoveSymptom,
     onRemoveSosMed,
+    onAddAura,
+    onRemoveAura,
     onAnalyze,
     onExportPDF,
     onBackup,
@@ -17,6 +20,8 @@ const EventsSymptoms = ({
     const [newSymptom, setNewSymptom] = useState('')
     const [newSymptomImpact, setNewSymptomImpact] = useState(2)
     const [newSosMed, setNewSosMed] = useState('')
+    const [newAura, setNewAura] = useState('')
+    const [newAuraImpact, setNewAuraImpact] = useState(2)
 
     const eventTypes = [
         {
@@ -54,6 +59,17 @@ const EventsSymptoms = ({
         if (newSosMed.trim()) {
             onAddSosMed(newSosMed.trim())
             setNewSosMed('')
+        }
+    }
+
+    const handleAddAura = () => {
+        if (newAura.trim()) {
+            onAddAura({
+                name: newAura.trim(),
+                impact: Number(newAuraImpact) || 1
+            })
+            setNewAura('')
+            setNewAuraImpact(2)
         }
     }
 
@@ -178,6 +194,59 @@ const EventsSymptoms = ({
                             )
                         })()
                     ))}
+                </div>
+            )}
+
+            {/* Aura Positiva */}
+            <div className="section-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span style={{ fontSize: '0.875rem' }}>✨</span> AURA POSITIVA
+            </div>
+            <div className="input-group mb-md" style={{ borderColor: 'rgba(34, 197, 94, 0.3)' }}>
+                <input
+                    type="text"
+                    placeholder="Ex: Caminhada, Sol, Meditação"
+                    value={newAura}
+                    onChange={(e) => setNewAura(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleAddAura()}
+                />
+                <select
+                    className="input-select"
+                    value={newAuraImpact}
+                    onChange={(e) => setNewAuraImpact(Number(e.target.value) || 1)}
+                >
+                    <option value={1}>Leve</option>
+                    <option value={2}>Moderado</option>
+                    <option value={3}>Intenso</option>
+                </select>
+                <button className="btn btn-aura btn-icon" onClick={handleAddAura}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <line x1="12" y1="5" x2="12" y2="19" />
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                    </svg>
+                </button>
+            </div>
+
+            {aura.length > 0 && (
+                <div className="flex gap-sm mb-md" style={{ flexWrap: 'wrap' }}>
+                    {aura.map((item, index) => {
+                        const normalized = typeof item === 'string'
+                            ? { name: item, impact: 1 }
+                            : item || {}
+
+                        const impact = normalized.impact || 1
+                        const impactLabel = impact === 1 ? 'leve' : impact === 3 ? 'intenso' : 'moderado'
+
+                        return (
+                            <span
+                                key={index}
+                                className="badge badge-aura"
+                                style={{ cursor: 'pointer' }}
+                                onClick={() => onRemoveAura(index)}
+                            >
+                                ✦ {normalized.name || 'Item'} ({impactLabel}) ✕
+                            </span>
+                        )
+                    })}
                 </div>
             )}
 
