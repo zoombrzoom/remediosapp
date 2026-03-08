@@ -1,5 +1,27 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import Header from './components/Header'
+
+const themePresets = {
+    blue:   { primary: '#3B82F6', dark: '#2563EB', light: '#60A5FA', rgb: '59, 130, 246' },
+    purple: { primary: '#8B5CF6', dark: '#7C3AED', light: '#A78BFA', rgb: '139, 92, 246' },
+    green:  { primary: '#10B981', dark: '#059669', light: '#34D399', rgb: '16, 185, 129' },
+    red:    { primary: '#EF4444', dark: '#DC2626', light: '#F87171', rgb: '239, 68, 68' },
+    orange: { primary: '#F97316', dark: '#EA580C', light: '#FB923C', rgb: '249, 115, 22' },
+    pink:   { primary: '#EC4899', dark: '#DB2777', light: '#F472B6', rgb: '236, 72, 153' },
+    teal:   { primary: '#14B8A6', dark: '#0D9488', light: '#2DD4BF', rgb: '20, 184, 166' },
+    yellow: { primary: '#EAB308', dark: '#CA8A04', light: '#FACC15', rgb: '234, 179, 8' },
+}
+
+const applyTheme = (colorKey) => {
+    const theme = themePresets[colorKey] || themePresets.blue
+    const root = document.documentElement
+    root.style.setProperty('--color-primary', theme.primary)
+    root.style.setProperty('--color-primary-dark', theme.dark)
+    root.style.setProperty('--color-primary-light', theme.light)
+    root.style.setProperty('--color-primary-rgb', theme.rgb)
+    root.style.setProperty('--color-primary-glow', `rgba(${theme.rgb}, 0.35)`)
+    root.style.setProperty('--gradient-primary', `linear-gradient(135deg, ${theme.primary} 0%, ${theme.dark} 100%)`)
+}
 import ProgressChart from './components/ProgressChart'
 import HealthGauge from './components/HealthGauge'
 import MedicationCard from './components/MedicationCard'
@@ -33,6 +55,7 @@ const App = () => {
     // Estado principal
     const [userName] = useState('David')
     const [userImage, setUserImage] = useLocalStorage('userImage', null)
+    const [accentColor, setAccentColor] = useLocalStorage('accentColor', 'blue')
     const [currentDate, setCurrentDate] = useState(new Date())
     const [currentFilter, setCurrentFilter] = useState('weekly')
     const [showMedsModal, setShowMedsModal] = useState(false)
@@ -52,6 +75,11 @@ const App = () => {
     // Dados diários persistidos
     const [allData, setAllData] = useLocalStorage('healthData', {})
 
+    // Apply accent color theme
+    useEffect(() => {
+        applyTheme(accentColor)
+    }, [accentColor])
+
     // Firebase Auth - Initialize on mount
     useEffect(() => {
         const unsubscribe = initAuth((user) => {
@@ -69,7 +97,8 @@ const App = () => {
         const cloudSignature = JSON.stringify({
             allData: data.allData || {},
             medications: data.medications || [],
-            userImage: data.userImage || null
+            userImage: data.userImage || null,
+            accentColor: data.accentColor || 'blue'
         })
         lastPushedSignatureRef.current = cloudSignature
 
@@ -92,12 +121,15 @@ const App = () => {
         if (data.userImage !== undefined) {
             setUserImage(data.userImage)
         }
+        if (data.accentColor) {
+            setAccentColor(data.accentColor)
+        }
 
         setTimeout(() => {
             isApplyingCloudDataRef.current = false
             cloudReadyRef.current = true
         }, 150)
-    }, [setAllData, setMedications, setUserImage])
+    }, [setAllData, setMedications, setUserImage, setAccentColor])
 
     // Initial fetch + real-time listener from Firebase
     useEffect(() => {
@@ -142,12 +174,14 @@ const App = () => {
             allData,
             medications,
             userName,
-            userImage
+            userImage,
+            accentColor
         }
         const payloadSignature = JSON.stringify({
             allData,
             medications,
-            userImage
+            userImage,
+            accentColor
         })
 
         if (payloadSignature === lastPushedSignatureRef.current) return
@@ -171,7 +205,7 @@ const App = () => {
                 clearTimeout(autoSaveTimeoutRef.current)
             }
         }
-    }, [firebaseUser, sharedDocId, allData, medications, userName, userImage])
+    }, [firebaseUser, sharedDocId, allData, medications, userName, userImage, accentColor])
 
     // Obter chave da data atual (usando timezone local, não UTC)
     const getDateKey = (date) => {
@@ -514,7 +548,8 @@ const App = () => {
                 if ((d.controls?.fatigue || 0) > 0) fatigueDays++
             })
 
-            const blue = [59, 130, 246]
+            const currentTheme = themePresets[accentColor] || themePresets.blue
+            const blue = currentTheme.rgb.split(', ').map(Number)
             const dark = [30, 30, 35]
             const white = [255, 255, 255]
             const grey = [160, 160, 168]
@@ -774,6 +809,7 @@ const App = () => {
             allData,
             medications,
             userName,
+            accentColor,
             exportedAt: new Date().toISOString(),
             version: '1.0'
         }
@@ -838,6 +874,9 @@ const App = () => {
                         onImageChange={setUserImage}
                         currentFilter={currentFilter}
                         onFilterChange={setCurrentFilter}
+                        accentColor={accentColor}
+                        onAccentColorChange={setAccentColor}
+                        themePresets={themePresets}
                     />
                     <ProgressChart
                         title="Corticoide"

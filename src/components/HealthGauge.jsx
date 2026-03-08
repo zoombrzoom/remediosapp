@@ -56,15 +56,15 @@ const HealthGauge = ({ medicationsTaken, totalMedications, symptoms, aura = [], 
         const centerY = height - 20
         const radius = Math.min(width, height) - 40
 
-        // Limpar
+        const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--color-primary').trim() || '#3B82F6'
+        const primaryRgb = getComputedStyle(document.documentElement).getPropertyValue('--color-primary-rgb').trim() || '59, 130, 246'
+
         ctx.clearRect(0, 0, width, height)
 
-        // Ângulos do arco (180 graus = semicírculo)
         const startAngle = Math.PI
         const endAngle = 2 * Math.PI
         const progressAngle = startAngle + ((overallScore / 100) * Math.PI)
 
-        // Track (fundo)
         ctx.beginPath()
         ctx.arc(centerX, centerY, radius, startAngle, endAngle)
         ctx.lineWidth = 16
@@ -72,14 +72,13 @@ const HealthGauge = ({ medicationsTaken, totalMedications, symptoms, aura = [], 
         ctx.lineCap = 'round'
         ctx.stroke()
 
-        // Progress (Azul elétrico - Dashboard style)
         if (overallScore > 0) {
             ctx.beginPath()
             ctx.arc(centerX, centerY, radius, startAngle, progressAngle)
             ctx.lineWidth = 16
-            ctx.strokeStyle = '#3B82F6'
+            ctx.strokeStyle = primaryColor
             ctx.lineCap = 'round'
-            ctx.shadowColor = 'rgba(59, 130, 246, 0.5)'
+            ctx.shadowColor = `rgba(${primaryRgb}, 0.5)`
             ctx.shadowBlur = 15
             ctx.stroke()
             ctx.shadowBlur = 0
@@ -137,7 +136,7 @@ const HealthGauge = ({ medicationsTaken, totalMedications, symptoms, aura = [], 
 
             <div className="gauge-stats">
                 <div className="gauge-stat">
-                    <span className="gauge-stat-dot" style={{ background: '#3B82F6' }}></span>
+                    <span className="gauge-stat-dot" style={{ background: 'var(--color-primary)' }}></span>
                     Meds {Math.round(medPercentage)}%
                 </div>
                 <div className="gauge-stat">

@@ -74,7 +74,7 @@ const DailyControls = ({ controls, onControlChange }) => {
                         value={controls[slider.id] || 0}
                         onChange={(e) => onControlChange(slider.id, parseInt(e.target.value))}
                         style={{
-                            background: `linear-gradient(to right, #3B82F6 0%, #3B82F6 ${((controls[slider.id] || 0) - slider.min) / (slider.max - slider.min) * 100}%, rgba(255,255,255,0.12) ${((controls[slider.id] || 0) - slider.min) / (slider.max - slider.min) * 100}%, rgba(255,255,255,0.12) 100%)`
+                            background: `linear-gradient(to right, var(--color-primary) 0%, var(--color-primary) ${((controls[slider.id] || 0) - slider.min) / (slider.max - slider.min) * 100}%, rgba(255,255,255,0.12) ${((controls[slider.id] || 0) - slider.min) / (slider.max - slider.min) * 100}%, rgba(255,255,255,0.12) 100%)`
                         }}
                     />
                 </div>

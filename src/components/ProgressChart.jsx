@@ -43,7 +43,7 @@ const ProgressChart = ({ title, value, maxValue, unit, weeklyData, trend }) => {
                                     style={{
                                         height: `${normalizeValue(data)}%`,
                                         opacity: isCurrentDay ? 1 : 0.4 + (index * 0.08),
-                                        background: isCurrentDay ? '#3B82F6' : 'rgba(255, 255, 255, 0.25)'
+                                        background: isCurrentDay ? 'var(--color-primary)' : 'rgba(255, 255, 255, 0.25)'
                                     }}
                                 />
                             </div>

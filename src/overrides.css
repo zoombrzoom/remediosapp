@@ -39,7 +39,7 @@ body::after {
 }
 
 body::before {
-  background: radial-gradient(ellipse 120% 80% at 50% -20%, rgba(59, 130, 246, 0.06) 0%, transparent 50%) !important;
+  background: radial-gradient(ellipse 120% 80% at 50% -20%, rgba(var(--color-primary-rgb), 0.06) 0%, transparent 50%) !important;
   animation: none !important;
 }
 
@@ -60,16 +60,16 @@ body::before {
 /* Botão primário - Azul elétrico (Upgrade style) */
 .btn-primary,
 .input-group button.btn-primary {
-  background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%) !important;
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%) !important;
   color: #FFFFFF !important;
   border: none !important;
-  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4) !important;
+  box-shadow: 0 4px 15px rgba(var(--color-primary-rgb), 0.4) !important;
 }
 
 .btn-primary:hover,
 .input-group button.btn-primary:hover {
-  background: linear-gradient(135deg, #60A5FA 0%, #3B82F6 100%) !important;
-  box-shadow: 0 6px 24px rgba(59, 130, 246, 0.5) !important;
+  background: linear-gradient(135deg, var(--color-primary-light) 0%, var(--color-primary) 100%) !important;
+  box-shadow: 0 6px 24px rgba(var(--color-primary-rgb), 0.5) !important;
 }
 
 /* Botões secundários e ghost */
@@ -85,9 +85,9 @@ body::before {
 
 .btn-secondary:hover,
 .btn-ghost:hover {
-  background: rgba(59, 130, 246, 0.15) !important;
-  border-color: rgba(59, 130, 246, 0.4) !important;
-  color: #60A5FA !important;
+  background: rgba(var(--color-primary-rgb), 0.15) !important;
+  border-color: rgba(var(--color-primary-rgb), 0.4) !important;
+  color: var(--color-primary-light) !important;
 }
 
 /* Inputs - Estilo unificado Dashboard */
@@ -155,7 +155,7 @@ input::placeholder {
 .input-group select:focus,
 .input-select:hover,
 .input-select:focus {
-  border-color: rgba(59, 130, 246, 0.5) !important;
+  border-color: rgba(var(--color-primary-rgb), 0.5) !important;
   outline: none !important;
 }
 
@@ -182,12 +182,12 @@ input[type="range"] {
 }
 
 input[type="range"]::-webkit-slider-thumb {
-  background: #3B82F6 !important;
-  box-shadow: 0 0 10px rgba(59, 130, 246, 0.5) !important;
+  background: var(--color-primary) !important;
+  box-shadow: 0 0 10px rgba(var(--color-primary-rgb), 0.5) !important;
 }
 
 .progress-fill {
-  background: linear-gradient(90deg, #3B82F6, #60A5FA) !important;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-primary-light)) !important;
 }
 
 /* Calendário */
@@ -198,20 +198,20 @@ input[type="range"]::-webkit-slider-thumb {
 }
 
 .calendar-day.today {
-  background: #3B82F6 !important;
+  background: var(--color-primary) !important;
   color: #FFFFFF !important;
-  border-color: #3B82F6 !important;
-  box-shadow: 0 0 12px rgba(59, 130, 246, 0.5) !important;
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 12px rgba(var(--color-primary-rgb), 0.5) !important;
 }
 
 .calendar-day.selected {
-  border: 1px solid #60A5FA !important;
+  border: 1px solid var(--color-primary-light) !important;
   color: #FFFFFF !important;
-  background: rgba(59, 130, 246, 0.2) !important;
+  background: rgba(var(--color-primary-rgb), 0.2) !important;
 }
 
 .calendar-day.has-data::after {
-  background: #3B82F6 !important;
+  background: var(--color-primary) !important;
 }
 
 .calendar-day:hover {
@@ -248,9 +248,9 @@ button.tag,
 
 button.tag.active,
 .tag.active {
-  border: 2px solid #3B82F6 !important;
-  background: rgba(59, 130, 246, 0.2) !important;
-  box-shadow: 0 0 12px rgba(59, 130, 246, 0.3) !important;
+  border: 2px solid var(--color-primary) !important;
+  background: rgba(var(--color-primary-rgb), 0.2) !important;
+  box-shadow: 0 0 12px rgba(var(--color-primary-rgb), 0.3) !important;
 }
 
 .tag-label {
@@ -284,9 +284,9 @@ button.tag.active,
 }
 
 .badge-info {
-  background: rgba(59, 130, 246, 0.2) !important;
-  color: #60A5FA !important;
-  border: 1px solid rgba(59, 130, 246, 0.4) !important;
+  background: rgba(var(--color-primary-rgb), 0.2) !important;
+  color: var(--color-primary-light) !important;
+  border: 1px solid rgba(var(--color-primary-rgb), 0.4) !important;
 }
 
 .badge,
@@ -336,7 +336,7 @@ button.tag.active,
 }
 
 .particle:nth-child(3n) {
-  box-shadow: 0 0 6px rgba(59, 130, 246, 0.08) !important;
+  box-shadow: 0 0 6px rgba(var(--color-primary-rgb), 0.08) !important;
 }
 
 .glass-overlay {
@@ -388,20 +388,20 @@ button.tag.active,
 }
 
 .progress-value {
-  color: #3B82F6 !important;
+  color: var(--color-primary) !important;
   font-weight: 600 !important;
 }
 
 /* Avatar - Anel azul */
 .avatar-ring {
-  border-color: #3B82F6 !important;
+  border-color: var(--color-primary) !important;
 }
 
 .avatar-placeholder {
-  background: linear-gradient(135deg, #3B82F6, #2563EB) !important;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark)) !important;
 }
 
-/* Card titles - ícones azuis */
+/* Card titles - ícones na cor de destaque */
 .card-title svg {
-  color: #3B82F6 !important;
+  color: var(--color-primary) !important;
 }

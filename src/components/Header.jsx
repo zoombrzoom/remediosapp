@@ -1,7 +1,8 @@
-import React, { useRef } from 'react'
+import React, { useRef, useState } from 'react'
 
-const Header = ({ userName, userImage, onImageChange, currentFilter, onFilterChange }) => {
+const Header = ({ userName, userImage, onImageChange, currentFilter, onFilterChange, accentColor, onAccentColorChange, themePresets }) => {
     const fileInputRef = useRef(null)
+    const [showColorPicker, setShowColorPicker] = useState(false)
 
     const options = [
         { value: 'weekly', label: 'Semanal' },
@@ -81,21 +82,67 @@ const Header = ({ userName, userImage, onImageChange, currentFilter, onFilterCha
 
             <div className="greeting-and-filter">
                 <h1 className="greeting-text">Olá {userName.split(' ')[0]}!</h1>
-                <div className="filter-dropdown">
-                    <select
-                        value={currentFilter}
-                        onChange={(e) => onFilterChange(e.target.value)}
-                        className="filter-select"
-                    >
-                        {options.map(filter => (
-                            <option key={filter.value} value={filter.value}>
-                                {filter.label}
-                            </option>
-                        ))}
-                    </select>
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="filter-arrow">
-                        <path d="M6 9l6 6 6-6" />
-                    </svg>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div className="filter-dropdown">
+                        <select
+                            value={currentFilter}
+                            onChange={(e) => onFilterChange(e.target.value)}
+                            className="filter-select"
+                        >
+                            {options.map(filter => (
+                                <option key={filter.value} value={filter.value}>
+                                    {filter.label}
+                                </option>
+                            ))}
+                        </select>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="filter-arrow">
+                            <path d="M6 9l6 6 6-6" />
+                        </svg>
+                    </div>
+
+                    <div style={{ position: 'relative' }}>
+                        <button
+                            onClick={() => setShowColorPicker(!showColorPicker)}
+                            className="color-picker-btn"
+                            style={{
+                                background: themePresets?.[accentColor]?.primary || '#3B82F6',
+                            }}
+                            title="Cor de destaque"
+                        >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <circle cx="13.5" cy="6.5" r="2.5" />
+                                <circle cx="6.5" cy="13.5" r="2.5" />
+                                <circle cx="17.5" cy="13.5" r="2.5" />
+                                <circle cx="13.5" cy="20.5" r="2.5" />
+                            </svg>
+                        </button>
+
+                        {showColorPicker && themePresets && (
+                            <>
+                                <div
+                                    style={{ position: 'fixed', inset: 0, zIndex: 99 }}
+                                    onClick={() => setShowColorPicker(false)}
+                                />
+                                <div className="color-picker-panel">
+                                    <span className="color-picker-label">Cor de destaque</span>
+                                    <div className="color-picker-grid">
+                                        {Object.entries(themePresets).map(([key, theme]) => (
+                                            <button
+                                                key={key}
+                                                className={`color-swatch ${accentColor === key ? 'active' : ''}`}
+                                                style={{ background: theme.primary }}
+                                                onClick={() => {
+                                                    onAccentColorChange(key)
+                                                    setShowColorPicker(false)
+                                                }}
+                                                title={key}
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+                            </>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>
